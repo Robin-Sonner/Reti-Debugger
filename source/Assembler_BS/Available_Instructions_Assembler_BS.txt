@@ -1,0 +1,67 @@
+Project: Reti Debugger
+Author: Robin Sonner
+License: MIT (view License.txt)
+inspired by the lectures "Technische Informatik" and "Betriebssysteme" at Albert-Ludwig Universität, Freiburg
+
+Note: heavily inspired by, but does NOT follow the specifications of "Betriebssysteme" precisely.
+
+Documentation for all available instructions:
+
+Hashtag Symbol is used as comment indicator -> lines beginning with <#> will be ignored.
+Empty lines will be ignored
+The instruction <JUMP 0> is used to terminate the your program
+
+D = Destination (ACC, IN1, IN2, PC, SP, BAF, DS, CS)
+S = Source (ACC, IN1, IN2, PC, SP, BAF, DS, CS)
+i = Integer, numbers allowed in range [-2^21, 2^21 - 1]
+Registers (S, D) allow numbers in range [-2^31, 2^31 - 1]
+Valid memory adresses are in range [0, 2^32]
+
+Instruction Syntax 	Description					Program Counter 		Example
+LOAD D i		D = memory[i]					PC += 1 if D != PC		LOAD ACC 5 -> ACC = memory[5]
+LOADIN1 D i		D = memory[IN1 + i]				PC += 1 if D != PC		LOADIN1 ACC 5 -> ACC = memory[7]  if IN1 = 2
+LOADIN2 D i		D = memory[IN2 + i]				PC += 1 if D != PC		LOADIN2 ACC 5 -> ACC = memory[9]  if IN2 = 4
+LOADIN D i		D = memory[S + i]				PC += 1 if D != PC		LOADIN PC 8 IN1 -> IN1 = memory[10] if PC = 2
+LOADI D i		D = i						PC += 1 if D != PC		LOADI IN1 8 -> IN1 = 8
+
+STORE D i		memory[i] = D					PC += 1				STORE 8 -> memory[8] = 11 if ACC = 11
+STOREIN1 S i 		memory[IN1 + i] = S				PC += 1				STOREIN1 DS 8 -> memory[9] = 11 if DS = 11 and IN1 = 1
+STOREIN2 S i		memory[IN2 + i] = S				PC += 1				STOREIN2 SP 2 -> memory[5] = 11 if SP = 11 and IN2 = 3
+STOREIN D S i		memory[D + i] = S				PC += 1				STOREIN CS ACC 5 -> memory[6] = 7 if ACC = 1 and CS = 7
+MOVE S D 		D = S						PC += 1 if D != PC		MOVE PC ACC -> ACC = 8 if PC = 8
+
+SUBI D i		D -= i						PC += 1 if D != PC		SUBI IN1 5 -> IN1 = IN1 - 5
+ADDI D i 		D += i						PC += 1 if D != PC		ADDI IN1 10 -> IN1 = IN1 + 10
+MULI D i		D *= i						PC += 1 if D != PC		MULI SP 10 -> SP = SP * 10
+DIVI D i		D /= i	(floats are rounded down)		PC += 1 if D != PC		DIVI CS 5 -> CS = CS / 5
+MODI D i		D = D mod i					PC += 1 if D != PC		MODI IN2 2 -> IN2 = IN2 mod 2
+OPLUSI D i 		D = XOR(D, i)					PC += 1 if D != PC		OPLUSI ACC 12 -> new ACC = 9 if old ACC = 5
+ORI D i 		D = OR(D, i)					PC += 1 if D != PC		ORI CS 16  -> new CS = 21 if old CS = 5
+ANDI D i		D = AND(D, i)					PC += 1 if D != PC		ANDI DS 16 -> new DS = 0 if old DS = 5
+
+SUB D i			D -= memory[i]					PC += 1 if D != PC		SUB ACC 5 -> ACC = ACC - memory[5]
+ADD D i			D += memory[i]					PC += 1 if D != PC		ADD ACC 5 -> ACC = ACC + memory[5]
+MUL D i			D *= memory[i]					PC += 1 if D != PC		MULI SP 10 -> SP = SP * memory[10]
+DIV D i			D /= memory[i]	(floats are rounded down)	PC += 1 if D != PC		DIVI CS 5 -> CS = CS / memory[5]
+MOD D i			D = D mod memory[i]				PC += 1 if D != PC		MODI IN2 2 -> IN2 = IN2 mod memory[2]
+OPLUS D i		D = XOR(D, memory[i])				PC += 1 if D != PC		OPLUS ACC 3 -> new ACC = 9 if old ACC = 5 and memory[3] = 12
+OR D i 			D = OR(D, memory[i])				PC += 1 if D != PC		OR ACC 4  -> new ACC = 21 if old ACC = 5 and memory[4] = 16
+AND D i			D = AND(D, memory[i])				PC += 1 if D != PC		AND ACC 4 -> new ACC = 0 if old ACC = 5 and memory[4] = 16
+
+SUBR D S		D -= S						PC +=1 if D != PC		SUBR ACC SP -> ACC = ACC - SP
+ADDR D S		D += S						PC +=1 if D != PC		ADDR IN1 CS -> IN1 = IN1 + CS
+MULR D S		D *= S						PC +=1 if D != PC		MULR IN2 IN1 -> IN2 = IN2 * IN1
+DIVR D S		D /= S						PC +=1 if D != PC		DIVR BAF CS -> BAF = BAF / CS
+MODR D S		D = D mod S					PC += 1 if D != PC		MODR ACC SP -> ACC = ACC mod SP
+OPLUSR D S		D = XOR(D, S)					PC += 1 if D != PC		OPLUSR ACC SP -> new ACC = 9 if old ACC = 5 and SP = 12
+ORR D S			D = OR(D, S)					PC += 1 if D != PC		ORR PC BAF -> new PC = 79 if old PC = 70 and BAF = 9
+ANDR D S		D = AND(D, S)					PC += 1 if D != PC  		ANDR IN1 PC -> new IN1 = 9 if old IN1 = 1 and PC = 8
+
+NOP 			No Operation					PC += 1				NOP -> Only increments program counter by +1
+JUMP> i			PC += i if ACC > 0, else PC += 1		PC += 1 if condition False	JUMP> 3  -> PC = PC + 3 if ACC > 0
+JUMP= i			PC += i if ACC == 0, else PC += 1		PC += 1 if condition False	JUMP> -3 -> PC = PC - 3 if ACC = 0
+JUMP>= i		PC += i if ACC >= 0, else PC += 1		PC += 1 if condition False	JUMP> 3  -> PC = PC + 3 if ACC >= 0
+JUMP< i			PC += i if ACC < 0, else PC += 1		PC += 1 if condition False	JUMP> -3 -> PC = PC - 3 if ACC < 0
+JUMP!= i		PC += i if ACC != 0, else PC += 1		PC += 1 if condition False	JUMP> 3  -> PC = PC + 3 if ACC != 0
+JUMP<= i		PC += i if ACC <= 0, else PC += 1		PC += 1 if condition False	JUMP> -3 -> PC = PC - 3 if ACC <= 0
+JUMP i			PC += i						PC += i 			JUMP> 3  -> PC = PC + 3

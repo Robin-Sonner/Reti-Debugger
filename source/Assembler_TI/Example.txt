@@ -1,0 +1,68 @@
+# Project: Reti Debugger
+# Author: Robin Sonner
+# License: MIT (view License.txt)
+# inspired by the lectures "Technische Informatik" and "Betriebssysteme" at Albert-Ludwig Universität, Freiburg
+
+# A program for the RE-TI that calculates the Fibonacci numbers:
+# Assumes that the value of n is at the beginning in storage[99].
+# f(0) will be stored in storage[100]
+# f(1) will be stored in storage[101]
+# ...
+# f(n) will be stored in storage[100 + n]
+
+# Initialize f(0) and f(1)
+LOADI ACC 0;
+STORE 100;
+LOADI ACC 1;
+STORE 101;
+
+# Initialize loop counter with 2 (f(2) is the next number we need)
+LOADI ACC 2;
+STORE 98;
+
+# Main loop
+
+# Find out if we are finished (f(n) is calculated))
+# If LoopCounter > n we have f(n) and can exit
+LOAD ACC 98;
+SUB ACC 99; 							# Calculate LoopCounter - n
+JUMP> 20;							# If loop counter > n, exit loop
+
+# Get f(k-1) with k = LoopCounter
+# Load loop counter and substract 1, store that in in1
+LOAD ACC 98;
+SUBI ACC 1;
+MOVE ACC IN1;
+# Load f(k-1) and store it in a temporary location
+LOADIN1 ACC 100;
+STORE 97;
+
+#  Get f(k-2) with k = LoopCounter
+# Load loop counter and substract 2, store that in in1
+LOAD ACC 98;
+SUBI ACC 2;
+MOVE ACC IN1;
+# Load f(n-2) into ACC
+LOADIN1 ACC 100;
+
+# Calculate f(k) = f(k-1) + f(k-2) with k = LoopCounter
+# f(k-2) is in ACC, f(k-1) is in M(97)
+ADD ACC 97;   
+STORE 96;						# Store f(k) in a tempoary location
+
+# Find out where to store f(k) and store it
+# Load loop counter and store it in in1
+LOAD ACC 98;
+MOVE ACC IN1;
+# Copy f(k) from M(96) to M(100 + k)
+LOAD ACC 96;
+STOREIN1 100;
+
+# Increment loop counter and jump back to the start of the loop
+LOAD ACC 98;
+ADDI ACC 1;
+STORE 98;
+JUMP -21;
+
+# Target 9: End program
+JUMP 0;

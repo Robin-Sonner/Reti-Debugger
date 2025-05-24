@@ -1,0 +1,3 @@
+ADD ACC 1;
+JUMP -5;
+JUMP 0;

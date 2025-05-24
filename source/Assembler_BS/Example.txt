@@ -1,0 +1,23 @@
+# Project: Reti Debugger
+# Author: Robin Sonner
+# License: MIT (view License.txt)
+# inspired by the lectures "Technische Informatik" and "Betriebssysteme" at Albert-Ludwig Universität, Freiburg
+
+# A program for the RE-TI that calculates the Faculty of a chosen POSITIVE number:
+# Assumes that the chosen number is in memory[10]
+# Output will be stored at memory[20]
+
+# Load 5 from memory[10] into ACC (ACC is used as loop counter)
+LOAD ACC 10;
+
+# Initialize IN1 = 1 (result)
+LOADI IN1 1;
+JUMP= 4; # Special Case: 0! = 1
+
+# Loop
+MULR IN1 ACC;
+SUBI ACC 1;
+JUMP> -2 # If ACC > 0, we are not yet finished 
+
+STORE IN1 20;
+JUMP 0;
