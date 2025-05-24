@@ -18,12 +18,12 @@ I need an Assembler class that has member variables for every register and membe
 # Start Guide:
 1. to help you create a program, see available_instructions.txt and example.txt
 2. Optional: You can specify initial content of the Assembler memory in a .json file like this:
-	Example:
-	{
-	“1” : 101,
-	“6” : 7,
-	“23” : 98
-	}
+	Example:  
+	{  
+	“1” : 101,  
+	“6” : 7,  
+	“23” : 98  
+	}  
 	Loads 101 in address 1, 7 in address 6, 98 in address 23 and 0 in any other address
 3. Pick one of the Assembler files and overwrite the Assembler file in the Main folder with it
    You likely want to start with the smaller Assembler_TI instruction set
